@@ -88,22 +88,32 @@ def myMazeSearch1(problem):
     n = Directions.NORTH
     e = Directions.EAST
     
-    stones1 = initFlagArray(50,50) #(x,y) starts from (1,1), for findNext1
-    stones2 = [] ##(x,y) starts from (1,1), for findNext2
-    actions = initActionArray()
 
+    actions = initActionArray()
     start = problem.getStartState() #(x,y) = (col, row)
     print start
 
+    #Search all root's succesors
+    successors = problem.getSuccessors(start)
+    for successor in successors:
+		stones2 = [] ##(x,y) starts from (1,1), for findNext2
+		stones2.append(start)
+		nextPos = successor[0]
+		pushAction(actions, successor[1])
+		findNext2(problem, stones2, actions, nextPos, 1)
+    #end of Search all root's succesors
     
+    #Search NOT all root's succesors, use stones1/findNext1 or stones2/findNext2
+    #stones1 = initFlagArray(50,50) #(x,y) starts from (1,1), for findNext1
+    #stones2 = [] ##(x,y) starts from (1,1), for findNext2    
     #findNext1(problem, stones1, actions, start, 1)
-    findNext2(problem, stones2, actions, start, 1)
-
-
+    #findNext2(problem, stones2, actions, start, 1)
+    #end of Search NOT all root's succesors
+    
     print actionsList
     shortestPath = 0
     for i in range(len(actionsList)):
-        if len(actionsList[i]) < len(actionsList[shortestPath]):
+        if len(actionsList[i]) <= len(actionsList[shortestPath]):
             shortestPath = i
                 
     return  actionsList[shortestPath]
@@ -155,7 +165,7 @@ def findNext2(problem, stones, actions, start, testSteps):
         print "Back to start"
 
     else:
-        popAction(actions)
+        if len(actions) >0: popAction(actions)
         print actions, start, "nowhere to go"          
             
     
