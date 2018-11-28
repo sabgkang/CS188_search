@@ -74,8 +74,126 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 #--------------------------------
+"""
+class Stack:
+    "A container with a last-in-first-out (LIFO) queuing policy."
+    def __init__(self):
+        self.list = []
 
+    def push(self,item):
+        "Push 'item' onto the stack"
+        self.list.append(item)
+
+    def pop(self):
+        "Pop the most recently pushed item from the stack"
+        return self.list.pop()
+
+    def isEmpty(self):
+        "Returns true if the stack is empty"
+        return len(self.list) == 0
+"""
 actionsList =[]
+stoneMap = []
+testSteps = 0
+
+def myMazeSearch5(problem):
+    global actionsList
+    """
+    Returns a sequence of moves that solves tinyMaze.  For any other maze, the
+    sequence of moves will be incorrect, so only use this for tinyMaze.
+    """
+
+    actions = util.Stack()
+    #rope = []
+    rope = util.Stack()
+    
+    start = problem.getStartState() 
+ 
+    findNext5(problem, rope, actions, start)
+    #print rope
+    #print "Final", actionsList
+    shortestPath = 0
+    
+    for i in range(len(actionsList)):
+        print "*** Path:", i, len(actionsList[i])
+        if len(actionsList[i]) <= len(actionsList[shortestPath]):
+            #print "shorter"
+            shortestPath = i
+    
+    print "Use steps:", testSteps, "Found ", len(actionsList), "pathes. Choose #", shortestPath  
+    print actionsList[shortestPath]
+    return  actionsList[shortestPath]
+
+def findNext5(problem, rope, actions, start):
+    global actionsList
+    global testSteps
+    
+    #print "***", start, actions.list
+    if problem.isGoalState(start):
+        #print "*********** Goal ****"
+        #a_copy = list(actions.list)
+        a_copy = list(actions.list)
+        actionsList.append(a_copy)
+        #print actions.list
+        
+        #popAction(actions)
+        actions.pop()
+        
+        #print actionsList
+        #print test
+        #goal = True
+        return
+    
+    #pushToRope(rope, start)
+    rope.push(start)
+    #print "*******",testSteps
+    #print rope
+    successors = problem.getSuccessors(start)
+      
+    for successor in successors:
+        nextFound = False
+        nextPos = successor[0]
+
+        posMark=False
+        for pos in rope.list:
+            #print "compare", pos, nextPos
+            #if (pos[0],pos[1]) == nextPos:
+            if pos == nextPos:
+                posMark = True
+                
+        if posMark == False:
+            #print "next found at ", nextPos, "steps", testSteps
+            limit = 20000    
+            if testSteps == limit:
+                print "stop at step#", limit
+                return False
+            
+            else:
+                testSteps += 1
+                #pushAction(actions, successor[1])
+                actions.push(successor[1])
+                #print actions
+                nextFound = findNext5(problem, rope, actions, nextPos)
+                #print "*****back to", start, "From", nextPos
+    
+    #print start, "serch is over", actions
+    if start == problem.getStartState():
+        #print "Back to start"
+        return
+
+    else:
+        #if actions.len()>0: 
+        if not actions.isEmpty():
+            #popAction(actions)
+            actions.pop()
+            
+            rope.pop()
+            #popFromRope(rope)
+            
+        #print start, "nowhere to go", actionsList 
+        
+    return
+
 def myMazeSearch1(problem):
     global actionsList
     """
@@ -117,8 +235,187 @@ def myMazeSearch1(problem):
             shortestPath = i
                 
     return  actionsList[shortestPath]
+
+def myMazeSearch4(problem):
+    global actionsList
+    """
+    Returns a sequence of moves that solves tinyMaze.  For any other maze, the
+    sequence of moves will be incorrect, so only use this for tinyMaze.
+    """
+    from game import Directions
+    s = Directions.SOUTH
+    w = Directions.WEST
+    n = Directions.NORTH
+    e = Directions.EAST
     
-    #return  [w, w, s, s, w, w]
+
+    actions = initActionArray()
+    start = problem.getStartState() #(x,y) = (col, row)
+
+    rope = []   
+    findNext4(problem, rope, actions, start)
+ 
+    #print "Final", actionsList
+    shortestPath = 0
+    
+    for i in range(len(actionsList)):
+        #print "*****", i, len(actionsList[i])
+        if len(actionsList[i]) <= len(actionsList[shortestPath]):
+            #print "shorter"
+            shortestPath = i
+    
+    print "Use steps:", testSteps, "Found ", len(actionsList), "pathes. Choose #", shortestPath  
+
+    return  actionsList[shortestPath]
+
+def findNext4(problem, rope, actions, start):
+    global actionsList
+    global testSteps
+    
+    if problem.isGoalState(start):
+        #print "*********** Goal ****"
+        a_copy = list(actions)
+        actionsList.append(a_copy)
+        #print actions
+        popAction(actions)
+        #print actionsList
+        #print test
+        #goal = True
+        return
+    
+    pushToRope(rope, start)
+    #print "*******",testSteps
+    #print rope
+    successors = problem.getSuccessors(start)
+      
+    for successor in successors:
+        nextFound = False
+        nextPos = successor[0]
+
+        posMark=False
+        for pos in rope:
+            #print "compare", pos, nextPos
+            if (pos[0],pos[1]) == nextPos:
+                posMark = True
+                
+        if posMark == False:
+            #print "next found at ", nextPos, "steps", testSteps
+            limit = 20000    
+            if testSteps == limit:
+                print "stop at step#", limit
+                return False
+            
+            else:
+                testSteps += 1
+                pushAction(actions, successor[1])
+                #print actions
+                nextFound = findNext4(problem, rope, actions, nextPos)
+                #print "*****back to", start, "From", nextPos
+    
+    #print start, "serch is over", actions
+    if start == problem.getStartState():
+        #print "Back to start"
+        return
+
+    else:
+        if len(actions) >0: 
+            popAction(actions)
+            popFromRope(rope)
+            
+        #print start, "nowhere to go" 
+        
+    return
+
+def myMazeSearch3(problem):
+    global actionsList
+    """
+    Returns a sequence of moves that solves tinyMaze.  For any other maze, the
+    sequence of moves will be incorrect, so only use this for tinyMaze.
+    """
+    from game import Directions
+    s = Directions.SOUTH
+    w = Directions.WEST
+    n = Directions.NORTH
+    e = Directions.EAST
+    
+
+    actions = initActionArray()
+    start = problem.getStartState() #(x,y) = (col, row)
+    print start
+
+    #Search all root's succesors
+#    successors = problem.getSuccessors(start)
+#    for successor in successors:
+#		stones2 = [] ##(x,y) starts from (1,1), for findNext2
+#		stones2.append(start)
+#		nextPos = successor[0]
+#		pushAction(actions, successor[1])
+#		findNext2(problem, stones2, actions, nextPos, 1)
+    #end of Search all root's succesors
+    
+    stones3 = [] ##(x,y) starts from (1,1), for findNext2    
+    findNext3(problem, stones3, actions, start, 1)
+
+    
+    print actionsList
+    shortestPath = 0
+    for i in range(len(actionsList)):
+        if len(actionsList[i]) <= len(actionsList[shortestPath]):
+            shortestPath = i
+                
+    return  actionsList[shortestPath]
+
+def findNext3(problem, stones, actions, start, testSteps):
+    global actionsList
+    global stoneMap
+    if problem.isGoalState(start):
+        print "*********** Goal ****"
+        a_copy = list(actions)
+        actionsList.append(a_copy)
+        print actions
+        popAction(actions)
+        print actionsList
+
+        goal = True
+        return True
+    
+    stones.append(start)
+    successors = problem.getSuccessors(start)
+      
+    for successor in successors:
+        nextFound = False
+        nextPos = successor[0]
+        pushStones(stoneMap, stones)
+        print "*******push",stones
+        stoneMark=False
+        for stone in stones:
+            if stone == nextPos:
+                stoneMark = True
+                
+        if stoneMark == False:
+            print "next found at ", nextPos, "steps", testSteps
+                
+            if testSteps == 100:
+                return False
+            
+            else:
+                testSteps += 1
+                pushAction(actions, successor[1])
+                print actions
+                nextFound = findNext3(problem, stones, actions, nextPos, testSteps)
+                stones = list(popStones(stoneMap))
+                print "*****pop", stones
+                print "*****back to", start, "From", nextPos
+    
+    print start, "serch is over", actions
+    if start == problem.getStartState():
+        print "Back to start"
+
+    else:
+        if len(actions) >0: popAction(actions)
+        print actions, start, "nowhere to go" 
+        
+    return
 
 # stones map uses a list to be appended to
 def findNext2(problem, stones, actions, start, testSteps):
@@ -216,6 +513,22 @@ def initActionArray():
     actions = []
     return actions
     
+def pushStones(stoneMap, stones):
+    stoneMap.append(list(stones))
+
+def popStones(stoneMap):
+    stonesPoped = stoneMap[-1]
+    stoneMap.pop()
+    return stonesPoped
+
+def pushToRope(rope, pos):
+    rope.append(list(pos))
+    
+def popFromRope(rope):
+    posPoped = list(rope[-1])
+    rope.pop()
+    return posPoped
+
 def pushAction(actions, actionToPush):
     actions.append(actionToPush)
 
@@ -223,7 +536,7 @@ def popAction(actions):
     actionPoped = actions[-1]
     actions.pop()
     return actionPoped
-    
+
 def initFlagArray(row,col):
     flags=[]
     for i in range(row):
