@@ -97,9 +97,9 @@ def depthFirstSearch(problem):
     actions = util.Stack()
     rope = util.Stack()
     
-    start = problem.getStartState() 
+    here = problem.getStartState() 
  
-    findNext(problem, rope, actions, start)
+    findNextDFS(problem, rope, actions, here)
 
     shortestPath = 0  
     for i in range(len(actionsList)):
@@ -112,19 +112,19 @@ def depthFirstSearch(problem):
     return  actionsList[shortestPath]
     util.raiseNotDefined()
 
-def findNext(problem, rope, actions, start):
+def findNextDFS(problem, rope, actions, here):
     global actionsList
     global testSteps
     
-    if problem.isGoalState(start):
+    if problem.isGoalState(here):
         actionsCopy = list(actions.list)
         actionsList.append(actionsCopy)
         actions.pop()
         return
     
     #move one step
-    rope.push(start)
-    successors = problem.getSuccessors(start)
+    rope.push(here)
+    successors = problem.getSuccessors(here)
       
     for successor in successors:
         nextFound = False
@@ -144,9 +144,9 @@ def findNext(problem, rope, actions, start):
             else:
                 testSteps += 1
                 actions.push(successor[1])
-                nextFound = findNext(problem, rope, actions, nextPos)
+                nextFound = findNextDFS(problem, rope, actions, nextPos)
     
-    if start == problem.getStartState():
+    if here == problem.getStartState():
         return
 
     else: #move one step
@@ -156,11 +156,77 @@ def findNext(problem, rope, actions, start):
             
     return    
 #---------------------------------
-    
+
+#-----Paul Kang------------------    
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    searchList = []
+    
+    start = problem.getStartState()
+
+    here=[None, None, start] #[pre, actionTohere, here]
+    searchList.append(here)
+    findNextBFS(problem, searchList, 0)
+    
+    for index in range(len(searchList)):
+        if problem.isGoalState(searchList[index][2]):
+            break
+    
+    print index
+    actions=util.Queue()
+    composeActions(searchList, actions, index) 
+    return actions.list
+    
+    #util.raiseNotDefined()
+
+def composeActions(searchList, actions, index):
+    actions.push(searchList[index][1])
+    
+    prevIndex = searchList[index][0]
+    if prevIndex ==0: return
+    composeActions(searchList, actions, prevIndex)
+
+def findNextBFS(problem, searchList, index): 
+    global testSteps
+    
+
+    if problem.isGoalState(searchList[index][2]):
+        print "********************goal*****"
+        return
+    
+    
+    limit = 10000    
+    if testSteps == limit:
+        print "stop at step#", limit
+        print aaa
+        return False
+            
+    else:
+        testSteps += 1
+        
+    successors = problem.getSuccessors(searchList[index][2])
+    
+    for successor in successors:
+        
+        for state in searchList:
+            #print "*****state", state[2], "next",successor[0]
+            nextVisited = False
+            if state[2] == successor[0]:
+                nextVisited = True
+                #print state[2], "next is visited"
+                break
+                
+        if nextVisited == False:
+            nextState = [index, successor[1], successor[0]]
+            searchList.append(nextState)
+    
+    index +=1
+    findNextBFS(problem, searchList, index)
+    
+    
+    
+#-----------------------
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
